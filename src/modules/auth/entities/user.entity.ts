@@ -1,39 +1,40 @@
 import { Expose } from 'class-transformer';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Field, Int, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Model, ResolveTimestamps } from 'mongoose';
 
-@Entity()
+@Schema()
 @ObjectType()
 export class User {
   constructor(partial?: Partial<User>) {
     Object.assign(this, partial);
   }
 
-  @PrimaryGeneratedColumn()
-  @Expose()
-  @Field(() => Int)
-  id: number;
-
-  @Column({ unique: true })
+  @Prop({ unique: true })
   @Expose()
   @Field()
   username: string;
 
-  @Column()
+  @Prop()
   password: string;
 
-  @Column({ unique: true })
+  @Prop({ unique: true })
   @Expose()
   @Field()
   email: string;
 
-  @Column()
+  @Prop()
   @Expose()
   @Field()
   firstName: string;
 
-  @Column()
+  @Prop()
   @Expose()
   @Field()
   lastName: string;
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);
+export type UserDocument = User &
+  ResolveTimestamps<Document, { timestamps: true }>;
+export type UserModel = Model<UserDocument>;

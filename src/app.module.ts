@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AuthModule } from './modules/auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { MainModule } from './modules/main.module';
 
 @Module({
   imports: [
@@ -18,7 +19,18 @@ import config from './config';
       playground: true,
       autoSchemaFile: true,
     }),
-    AuthModule,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (ConfigService: ConfigService) => {
+        return {
+          uri: ConfigService.get('app.databaseUri'),
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        };
+      },
+    }),
+    MainModule,
   ],
   controllers: [],
   providers: [],
